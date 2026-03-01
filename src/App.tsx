@@ -1040,15 +1040,17 @@ const App: React.FC = () => {
             ) : null;
           })()}
 
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
-              <Zap className="w-3 h-3 text-emerald-500" />
-              <h2 className="text-[9px] font-black uppercase tracking-widest text-slate-500">Calibrazione Ratio</h2>
-            </div>
-            <IndustrialInput label="Tirata Ottenuta (mm)" name="tirataRiferimento" value={inputs.tirataRiferimento} onChange={handleInputChange} highlight placeholder="es. 4800" />
+          {currentView === 'calcoli' && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+                <Zap className="w-3 h-3 text-emerald-500" />
+                <h2 className="text-[9px] font-black uppercase tracking-widest text-slate-500">Calibrazione Ratio</h2>
+              </div>
+              <IndustrialInput label="Tirata Ottenuta (mm)" name="tirataRiferimento" value={inputs.tirataRiferimento} onChange={handleInputChange} highlight placeholder="es. 4800" />
 
-            <IndustrialInput label="Fondello (mm)" name="fondello" value={inputs.fondello} onChange={handleInputChange} placeholder="es. 17" />
-          </div>
+              <IndustrialInput label="Fondello (mm)" name="fondello" value={inputs.fondello} onChange={handleInputChange} placeholder="es. 17" />
+            </div>
+          )}
 
           <div className="space-y-4">
             <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
