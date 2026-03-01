@@ -294,6 +294,7 @@ const App: React.FC = () => {
   const [completedOrders, setCompletedOrders] = useState<Array<{ id: string; articolo: string; numeroBarra?: string; lega: string; billette: number; logsDecimali: number; logName: string; cut: number; pesoLordo: number; pesoNetto: number; completedAt: string }>>([]);
 
   const fetchArticoli = async () => {
+    if (!supabase) return;
     try {
       setDbLoading(true);
       const { data, error } = await supabase.from('articoli').select('*');
@@ -326,6 +327,7 @@ const App: React.FC = () => {
   };
 
   const fetchDieHistory = async () => {
+    if (!supabase) return;
     const { data, error } = await supabase.from('die_history').select('*').order('created_at', { ascending: false });
     if (!error && data) {
       setDieHistory(data.map(item => ({
@@ -445,6 +447,7 @@ const App: React.FC = () => {
       operatore: operatore ? operatore.trim() : null,
     };
 
+    if (!supabase) return;
     const { error } = await supabase.from('die_history').insert(payload);
     if (error) {
       console.error('Error saving die history:', error);
@@ -474,6 +477,7 @@ const App: React.FC = () => {
     };
 
     // Assuming 'articolo' is a unique constraint, supabase upsert handles insert or update.
+    if (!supabase) return;
     const { error } = await supabase.from('articoli').upsert(dbPayload, { onConflict: 'articolo' });
 
     if (error) {
@@ -486,6 +490,7 @@ const App: React.FC = () => {
   };
 
   const handleDeleteFromDB = async (articolo: string) => {
+    if (!supabase) return;
     const { error } = await supabase.from('articoli').delete().eq('articolo', articolo);
     if (error) {
       console.error('Error deleting from Supabase:', error);
