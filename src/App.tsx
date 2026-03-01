@@ -959,88 +959,88 @@ const App: React.FC = () => {
       </header>
 
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-        <aside className="w-full lg:w-[340px] bg-[#0f172a] border-r border-slate-800 p-3 sm:p-5 overflow-y-auto space-y-4 sm:space-y-6 shadow-inner custom-scrollbar max-h-[45vh] lg:max-h-none">
+        {currentView === 'calcoli' && (
+          <aside className="w-full lg:w-[340px] bg-[#0f172a] border-r border-slate-800 p-3 sm:p-5 overflow-y-auto space-y-4 sm:space-y-6 shadow-inner custom-scrollbar max-h-[45vh] lg:max-h-none">
 
-          {(() => {
-            const activeOrd = ordini.find(o => o.id === activeOrdineId);
-            const activeIdx = ordini.findIndex(o => o.id === activeOrdineId);
-            const hasNext = activeIdx >= 0 && activeIdx < ordini.length - 1;
-            const loadOrder = (ord: typeof ordini[0]) => {
-              const r = computeOrdineResults(ord);
-              setInputs(prev => ({
-                ...prev,
-                tirataRiferimento: ord.tirataRiferimento || prev.tirataRiferimento,
-                taglioRiferimento: ord.taglioRiferimento || prev.taglioRiferimento,
-                fondello: ord.fondello,
-                lunghezzaBarra: ord.lunghezzaBarra,
-                numeroBarre: ord.numeroBarre,
-                numeroLuci: ord.numeroLuci,
-                pesoMTL: ord.pesoMTL,
-                scartoTesta: ord.scartoTesta,
-                scartoCoda: ord.scartoCoda,
-                billettoneId: r.logId,
-                taglioManuale: r.cut,
-                modalitaManuale: !r.isStandardMatched,
-              }));
-              if (r.isStandardMatched) setSelectedCut(r.cut);
-              setActiveOrdineId(ord.id);
-            };
-            const archiveAndAdvance = (nextOrd?: typeof ordini[0]) => {
-              if (activeOrd) {
-                const r = computeOrdineResults(activeOrd);
-                setCompletedOrders(prev => [{
-                  id: activeOrd.id,
-                  articolo: activeOrd.articolo,
-                  numeroBarra: activeOrd.numeroBarra,
-                  lega: activeOrd.lega,
-                  billette: r.billette,
-                  logsDecimali: r.logsDecimali,
-                  logName: r.logName,
-                  cut: r.cut,
-                  // Ø206: ~90 kg/m di alluminio per la sezione della billetta
-                  pesoLordo: Math.round((r.cut / 1000) * 90 * r.billette),
-                  pesoNetto: Math.round(activeOrd.numeroBarre * (activeOrd.lunghezzaBarra / 1000) * (activeOrd.pesoMTL / 1000)),
-                  completedAt: new Date().toLocaleString('it-IT'),
-                }, ...prev]);
-                setOrdini(prev => prev.filter(o => o.id !== activeOrd.id));
-              }
-              if (nextOrd) {
-                loadOrder(nextOrd);
-              } else {
-                setActiveOrdineId(null);
-              }
-            };
-            return activeOrd ? (
-              <div className="bg-violet-500/10 border border-violet-500/30 rounded-xl p-3 flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2 min-w-0">
-                  <Activity className="w-4 h-4 text-violet-400 shrink-0" />
-                  <div className="min-w-0">
-                    <span className="text-[8px] font-black text-violet-400/70 uppercase tracking-wider block">In Estrusione</span>
-                    <span className="text-sm font-black text-white mono truncate block">{activeOrd.articolo || 'Senza nome'}{activeOrd.numeroBarra ? ` / ${activeOrd.numeroBarra}` : ''}</span>
+            {(() => {
+              const activeOrd = ordini.find(o => o.id === activeOrdineId);
+              const activeIdx = ordini.findIndex(o => o.id === activeOrdineId);
+              const hasNext = activeIdx >= 0 && activeIdx < ordini.length - 1;
+              const loadOrder = (ord: typeof ordini[0]) => {
+                const r = computeOrdineResults(ord);
+                setInputs(prev => ({
+                  ...prev,
+                  tirataRiferimento: ord.tirataRiferimento || prev.tirataRiferimento,
+                  taglioRiferimento: ord.taglioRiferimento || prev.taglioRiferimento,
+                  fondello: ord.fondello,
+                  lunghezzaBarra: ord.lunghezzaBarra,
+                  numeroBarre: ord.numeroBarre,
+                  numeroLuci: ord.numeroLuci,
+                  pesoMTL: ord.pesoMTL,
+                  scartoTesta: ord.scartoTesta,
+                  scartoCoda: ord.scartoCoda,
+                  billettoneId: r.logId,
+                  taglioManuale: r.cut,
+                  modalitaManuale: !r.isStandardMatched,
+                }));
+                if (r.isStandardMatched) setSelectedCut(r.cut);
+                setActiveOrdineId(ord.id);
+              };
+              const archiveAndAdvance = (nextOrd?: typeof ordini[0]) => {
+                if (activeOrd) {
+                  const r = computeOrdineResults(activeOrd);
+                  setCompletedOrders(prev => [{
+                    id: activeOrd.id,
+                    articolo: activeOrd.articolo,
+                    numeroBarra: activeOrd.numeroBarra,
+                    lega: activeOrd.lega,
+                    billette: r.billette,
+                    logsDecimali: r.logsDecimali,
+                    logName: r.logName,
+                    cut: r.cut,
+                    // Ø206: ~90 kg/m di alluminio per la sezione della billetta
+                    pesoLordo: Math.round((r.cut / 1000) * 90 * r.billette),
+                    pesoNetto: Math.round(activeOrd.numeroBarre * (activeOrd.lunghezzaBarra / 1000) * (activeOrd.pesoMTL / 1000)),
+                    completedAt: new Date().toLocaleString('it-IT'),
+                  }, ...prev]);
+                  setOrdini(prev => prev.filter(o => o.id !== activeOrd.id));
+                }
+                if (nextOrd) {
+                  loadOrder(nextOrd);
+                } else {
+                  setActiveOrdineId(null);
+                }
+              };
+              return activeOrd ? (
+                <div className="bg-violet-500/10 border border-violet-500/30 rounded-xl p-3 flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Activity className="w-4 h-4 text-violet-400 shrink-0" />
+                    <div className="min-w-0">
+                      <span className="text-[8px] font-black text-violet-400/70 uppercase tracking-wider block">In Estrusione</span>
+                      <span className="text-sm font-black text-white mono truncate block">{activeOrd.articolo || 'Senza nome'}{activeOrd.numeroBarra ? ` / ${activeOrd.numeroBarra}` : ''}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {hasNext ? (
+                      <button
+                        onClick={() => archiveAndAdvance(ordini[activeIdx + 1])}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/40 text-violet-300 text-[9px] font-black uppercase tracking-wider transition-colors"
+                      >
+                        Prossimo <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => archiveAndAdvance()}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-[9px] font-black uppercase tracking-wider transition-colors"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Completa
+                      </button>
+                    )}
                   </div>
                 </div>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  {hasNext ? (
-                    <button
-                      onClick={() => archiveAndAdvance(ordini[activeIdx + 1])}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/40 text-violet-300 text-[9px] font-black uppercase tracking-wider transition-colors"
-                    >
-                      Prossimo <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => archiveAndAdvance()}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-[9px] font-black uppercase tracking-wider transition-colors"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Completa
-                    </button>
-                  )}
-                </div>
-              </div>
-            ) : null;
-          })()}
+              ) : null;
+            })()}
 
-          {currentView === 'calcoli' && (
             <div className="space-y-4">
               <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
                 <Zap className="w-3 h-3 text-emerald-500" />
@@ -1050,97 +1050,97 @@ const App: React.FC = () => {
 
               <IndustrialInput label="Fondello (mm)" name="fondello" value={inputs.fondello} onChange={handleInputChange} placeholder="es. 17" />
             </div>
-          )}
 
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
-              <Layers className="w-3 h-3 text-blue-500" />
-              <h2 className="text-[9px] font-black uppercase tracking-widest text-slate-500">Dati Commessa</h2>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+                <Layers className="w-3 h-3 text-blue-500" />
+                <h2 className="text-[9px] font-black uppercase tracking-widest text-slate-500">Dati Commessa</h2>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <IndustrialInput label="L. Barra (mm)" name="lunghezzaBarra" value={inputs.lunghezzaBarra} onChange={handleInputChange} placeholder="es. 3000" />
+                <IndustrialInput label="Peso MTL (g/m)" name="pesoMTL" value={inputs.pesoMTL} onChange={handleInputChange} placeholder="es. 24368" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <IndustrialInput
+                  label="Barre Ordine"
+                  name="numeroBarre"
+                  value={inputs.numeroBarre}
+                  onChange={handleInputChange}
+                  helper={`+10% Sfrido: ${Math.floor(inputs.numeroBarre * 1.1)} PZ`}
+                  placeholder="es. 68"
+                />
+                <IndustrialInput label="Num. Luci" name="numeroLuci" value={inputs.numeroLuci} onChange={handleInputChange} placeholder="es. 1" />
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <IndustrialInput label="L. Barra (mm)" name="lunghezzaBarra" value={inputs.lunghezzaBarra} onChange={handleInputChange} placeholder="es. 3000" />
-              <IndustrialInput label="Peso MTL (g/m)" name="pesoMTL" value={inputs.pesoMTL} onChange={handleInputChange} placeholder="es. 24368" />
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+                <Ruler className="w-3 h-3 text-red-500" />
+                <h2 className="text-[9px] font-black uppercase tracking-widest text-slate-500">Scarti Processo</h2>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <IndustrialInput label="Sfrido Testa" name="scartoTesta" value={inputs.scartoTesta} onChange={handleInputChange} placeholder="es. 600" />
+                <IndustrialInput label="Sfrido Coda" name="scartoCoda" value={inputs.scartoCoda} onChange={handleInputChange} placeholder="es. 700" />
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+                <Activity className="w-3 h-3 text-cyan-500" />
+                <h2 className="text-[9px] font-black uppercase tracking-widest text-slate-500">Tracking Produzione</h2>
+              </div>
               <IndustrialInput
-                label="Barre Ordine"
-                name="numeroBarre"
-                value={inputs.numeroBarre}
+                label="Billette Estruse"
+                name="billetteEstruse"
+                value={inputs.billetteEstruse}
                 onChange={handleInputChange}
-                helper={`+10% Sfrido: ${Math.floor(inputs.numeroBarre * 1.1)} PZ`}
-                placeholder="es. 68"
+                customColor={results.isValid && inputs.billetteEstruse > 0 ? (results.isCompletato ? 'border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.2)]' : 'border-cyan-500/50 shadow-[0_0_10px_rgba(6,182,212,0.15)]') : undefined}
+                helper={results.isValid ? `${results.billetteRimanenti} billette rimanenti` : undefined}
               />
-              <IndustrialInput label="Num. Luci" name="numeroLuci" value={inputs.numeroLuci} onChange={handleInputChange} placeholder="es. 1" />
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
-              <Ruler className="w-3 h-3 text-red-500" />
-              <h2 className="text-[9px] font-black uppercase tracking-widest text-slate-500">Scarti Processo</h2>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <IndustrialInput label="Sfrido Testa" name="scartoTesta" value={inputs.scartoTesta} onChange={handleInputChange} placeholder="es. 600" />
-              <IndustrialInput label="Sfrido Coda" name="scartoCoda" value={inputs.scartoCoda} onChange={handleInputChange} placeholder="es. 700" />
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
-              <Activity className="w-3 h-3 text-cyan-500" />
-              <h2 className="text-[9px] font-black uppercase tracking-widest text-slate-500">Tracking Produzione</h2>
-            </div>
-            <IndustrialInput
-              label="Billette Estruse"
-              name="billetteEstruse"
-              value={inputs.billetteEstruse}
-              onChange={handleInputChange}
-              customColor={results.isValid && inputs.billetteEstruse > 0 ? (results.isCompletato ? 'border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.2)]' : 'border-cyan-500/50 shadow-[0_0_10px_rgba(6,182,212,0.15)]') : undefined}
-              helper={results.isValid ? `${results.billetteRimanenti} billette rimanenti` : undefined}
-            />
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
-              <Factory className="w-3 h-3 text-amber-500" />
-              <h2 className="text-[9px] font-black uppercase tracking-widest text-slate-500">Configurazione Forno</h2>
             </div>
 
-            <div className="space-y-3">
-              <select
-                name="billettoneId"
-                value={inputs.billettoneId}
-                onChange={(e) => setInputs(p => ({ ...p, billettoneId: e.target.value }))}
-                className="w-full bg-slate-950 text-white border-2 border-slate-800 p-2.5 text-sm font-black rounded-lg focus:border-emerald-500 outline-none cursor-pointer"
-              >
-                {BILLET_TYPES.map(b => <option key={b.id} value={b.id}>{b.name} ({b.length}mm)</option>)}
-              </select>
-
-              <div onClick={toggleGiunta} className="flex items-center justify-between p-3 bg-slate-950/50 rounded-lg border border-slate-800 cursor-pointer hover:bg-slate-950 transition-colors group">
-                <div className="flex items-center gap-2">
-                  <Link2 className={`w-3 h-3 ${inputs.abilitaGiunta ? 'text-blue-400' : 'text-slate-500'}`} />
-                  <span className={`text-[10px] font-black uppercase ${inputs.abilitaGiunta ? 'text-blue-400' : 'text-slate-400'}`}>Abilita Compensato</span>
-                </div>
-                <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${inputs.abilitaGiunta ? 'bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.4)]' : 'bg-slate-700'}`}>
-                  <div className={`absolute top-1 w-3 h-3 bg-white rounded-full shadow-md transition-all duration-300 ${inputs.abilitaGiunta ? 'left-6' : 'left-1'}`}></div>
-                </div>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+                <Factory className="w-3 h-3 text-amber-500" />
+                <h2 className="text-[9px] font-black uppercase tracking-widest text-slate-500">Configurazione Forno</h2>
               </div>
 
-              <div onClick={toggleManualMode} className="flex items-center justify-between p-3 bg-slate-950/50 rounded-lg border border-slate-800 cursor-pointer hover:bg-slate-950 transition-colors group">
-                <span className="text-[10px] font-black uppercase text-slate-400 group-hover:text-white">Modalità Manuale</span>
-                <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${inputs.modalitaManuale ? 'bg-amber-600 shadow-[0_0_10px_rgba(217,119,6,0.4)]' : 'bg-slate-700'}`}>
-                  <div className={`absolute top-1 w-3 h-3 bg-white rounded-full shadow-md transition-all duration-300 ${inputs.modalitaManuale ? 'left-6' : 'left-1'}`}></div>
-                </div>
-              </div>
+              <div className="space-y-3">
+                <select
+                  name="billettoneId"
+                  value={inputs.billettoneId}
+                  onChange={(e) => setInputs(p => ({ ...p, billettoneId: e.target.value }))}
+                  className="w-full bg-slate-950 text-white border-2 border-slate-800 p-2.5 text-sm font-black rounded-lg focus:border-emerald-500 outline-none cursor-pointer"
+                >
+                  {BILLET_TYPES.map(b => <option key={b.id} value={b.id}>{b.name} ({b.length}mm)</option>)}
+                </select>
 
-              {inputs.modalitaManuale && (
-                <div className="animate-in slide-in-from-top-2">
-                  <IndustrialInput label="Taglio Attivo (mm)" name="taglioManuale" value={inputs.taglioManuale} onChange={handleInputChange} customColor="border-amber-500/50 text-amber-400" placeholder="es. 894" optional />
+                <div onClick={toggleGiunta} className="flex items-center justify-between p-3 bg-slate-950/50 rounded-lg border border-slate-800 cursor-pointer hover:bg-slate-950 transition-colors group">
+                  <div className="flex items-center gap-2">
+                    <Link2 className={`w-3 h-3 ${inputs.abilitaGiunta ? 'text-blue-400' : 'text-slate-500'}`} />
+                    <span className={`text-[10px] font-black uppercase ${inputs.abilitaGiunta ? 'text-blue-400' : 'text-slate-400'}`}>Abilita Compensato</span>
+                  </div>
+                  <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${inputs.abilitaGiunta ? 'bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.4)]' : 'bg-slate-700'}`}>
+                    <div className={`absolute top-1 w-3 h-3 bg-white rounded-full shadow-md transition-all duration-300 ${inputs.abilitaGiunta ? 'left-6' : 'left-1'}`}></div>
+                  </div>
                 </div>
-              )}
+
+                <div onClick={toggleManualMode} className="flex items-center justify-between p-3 bg-slate-950/50 rounded-lg border border-slate-800 cursor-pointer hover:bg-slate-950 transition-colors group">
+                  <span className="text-[10px] font-black uppercase text-slate-400 group-hover:text-white">Modalità Manuale</span>
+                  <div className={`w-10 h-5 rounded-full relative transition-all duration-300 ${inputs.modalitaManuale ? 'bg-amber-600 shadow-[0_0_10px_rgba(217,119,6,0.4)]' : 'bg-slate-700'}`}>
+                    <div className={`absolute top-1 w-3 h-3 bg-white rounded-full shadow-md transition-all duration-300 ${inputs.modalitaManuale ? 'left-6' : 'left-1'}`}></div>
+                  </div>
+                </div>
+
+                {inputs.modalitaManuale && (
+                  <div className="animate-in slide-in-from-top-2">
+                    <IndustrialInput label="Taglio Attivo (mm)" name="taglioManuale" value={inputs.taglioManuale} onChange={handleInputChange} customColor="border-amber-500/50 text-amber-400" placeholder="es. 894" optional />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </aside>
+          </aside>
+        )}
 
         <section className="flex-1 p-3 sm:p-6 lg:p-8 overflow-y-auto bg-[#020617] custom-scrollbar">
           {currentView === 'calcoli' && !results.isValid ? (
