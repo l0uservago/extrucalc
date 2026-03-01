@@ -19,13 +19,127 @@ body {
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: #1e293b;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #475569;
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #64748b;
+}
+
+/* ===== MOBILE-SPECIFIC OVERRIDES (< 768px) ===== */
+@media (max-width: 767px) {
+
+  /* Header: wrap and compact */
+  header {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    padding: 10px 12px !important;
+  }
+
+  /* Nav buttons: compact, scroll horizontally */
+  header>div:last-child {
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    gap: 6px !important;
+    justify-content: flex-start !important;
+  }
+
+  header>div:last-child::-webkit-scrollbar {
+    display: none;
+  }
+
+  header>div:last-child button {
+    padding: 6px 10px !important;
+    flex-shrink: 0;
+    min-width: fit-content;
+  }
+
+  /* Main layout: vertical stack */
+  main {
+    flex-direction: column !important;
+  }
+
+  /* Sidebar: full width, limited max-height, scrollable */
+  aside {
+    width: 100% !important;
+    max-height: 45vh !important;
+    border-right: none !important;
+    border-bottom: 1px solid #1e293b;
+    padding: 12px !important;
+  }
+
+  /* Main content: tighter padding */
+  section {
+    padding: 12px !important;
+  }
+
+  /* Result cards: 2-column grid */
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  /* Stat cards in ordini: 2-column */
+  .grid.grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  /* Form grids in ordini: single column */
+  .grid.grid-cols-2.sm\:grid-cols-3 {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  /* Footer: more compact */
+  footer {
+    padding: 10px 12px !important;
+    gap: 6px !important;
+  }
+
+  /* Touch-friendly minimum sizes */
+  button {
+    min-height: 36px;
+  }
+
+  input,
+  select {
+    min-height: 38px;
+  }
+
+  /* Recommendation cards: stack content */
+  .flex.items-start.gap-3 {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* Fix industrial input containers for mobile */
+  .space-y-6>div {
+    margin-bottom: 4px;
+  }
+}
+
+/* Extra small screens (< 380px) */
+@media (max-width: 379px) {
+  header h1 {
+    font-size: 14px !important;
+  }
+
+  aside {
+    max-height: 40vh !important;
+    padding: 8px !important;
+  }
+
+  section {
+    padding: 8px !important;
+  }
 }

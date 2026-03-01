@@ -864,7 +864,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200 flex flex-col font-sans selection:bg-emerald-500/30">
-      <header className="bg-[#0f172a] border-b border-emerald-500/30 p-4 flex justify-between items-center shadow-xl z-10">
+      <header className="bg-[#0f172a] border-b border-emerald-500/30 p-3 sm:p-4 flex flex-wrap sm:flex-nowrap justify-between items-center gap-2 sm:gap-4 shadow-xl z-10">
         <button onClick={handleReset} className="flex items-center gap-4 group transition-all">
           <div className="bg-emerald-500 p-2 rounded shadow-[0_0_15px_rgba(16,185,129,0.3)] group-hover:bg-emerald-400">
             <Monitor className="w-5 h-5 text-slate-950" />
@@ -874,12 +874,12 @@ const App: React.FC = () => {
               <h1 className="text-lg font-black tracking-tighter text-white uppercase italic leading-none group-hover:text-emerald-400">EXTRUCALC Ø206</h1>
               <span className="text-[7px] font-black text-emerald-500/40 uppercase tracking-[0.2em] hidden sm:block">Developed by Robert Musin</span>
             </div>
-            <p className="text-[9px] font-bold text-emerald-500 tracking-[0.3em] uppercase opacity-70 mt-1 flex items-center gap-1">
+            <p className="text-[9px] font-bold text-emerald-500 tracking-[0.3em] uppercase opacity-70 mt-1 items-center gap-1 hidden sm:flex">
               <RotateCcw className="w-2 h-2" /> Reset Calcoli
             </p>
           </div>
         </button>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3 overflow-x-auto w-full sm:w-auto">
           <button
             onClick={() => setCurrentView('calcoli')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${currentView === 'calcoli'
@@ -959,7 +959,7 @@ const App: React.FC = () => {
       </header>
 
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-        <aside className="w-full lg:w-[340px] bg-[#0f172a] border-r border-slate-800 p-5 overflow-y-auto space-y-6 shadow-inner custom-scrollbar">
+        <aside className="w-full lg:w-[340px] bg-[#0f172a] border-r border-slate-800 p-3 sm:p-5 overflow-y-auto space-y-4 sm:space-y-6 shadow-inner custom-scrollbar max-h-[45vh] lg:max-h-none">
 
           {(() => {
             const activeOrd = ordini.find(o => o.id === activeOrdineId);
@@ -1140,7 +1140,7 @@ const App: React.FC = () => {
           </div>
         </aside>
 
-        <section className="flex-1 p-6 lg:p-8 overflow-y-auto bg-[#020617] custom-scrollbar">
+        <section className="flex-1 p-3 sm:p-6 lg:p-8 overflow-y-auto bg-[#020617] custom-scrollbar">
           {currentView === 'calcoli' && !results.isValid ? (
             <div className="h-full flex flex-col items-center justify-center text-center opacity-50">
               <AlertTriangle className="w-16 h-16 text-amber-500 mb-4" />
