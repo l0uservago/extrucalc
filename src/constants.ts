@@ -78,3 +78,13 @@ export const INITIAL_INPUTS: CalculationInputs = {
   abilitaGiunta: false,
   billetteEstruse: 0,
 };
+
+export const ALLOY_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  "6082": { bg: "bg-rose-500/20", text: "text-rose-400", border: "border-rose-500/50" },
+  "6060": { bg: "bg-emerald-500/20", text: "text-emerald-400", border: "border-emerald-500/50" },
+  "3103": { bg: "bg-fuchsia-500/20", text: "text-fuchsia-400", border: "border-fuchsia-500/50" },
+  "1050": { bg: "bg-slate-500/20", text: "text-slate-400", border: "border-slate-500/50" },
+  "6005": { bg: "bg-amber-500/20", text: "text-amber-400", border: "border-amber-500/50" },
+  "6063": { bg: "bg-cyan-500/20", text: "text-cyan-400", border: "border-cyan-500/50" },
+  "6061": { bg: "bg-blue-500/20", text: "text-blue-400", border: "border-blue-500/50" }
+};

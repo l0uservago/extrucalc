@@ -33,12 +33,14 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { BILLET_TYPES, INITIAL_INPUTS } from "./constants";
+import { BILLET_TYPES, INITIAL_INPUTS, ALLOY_COLORS } from "./constants";
 import {
   CalculationInputs,
   Ordine,
   ArticoloDB,
   DieHistoryEntry,
+  FornoLog,
+  AluminumAlloy,
 } from "./types";
 import { motion, AnimatePresence } from "motion/react";
 import { supabase } from "./supabaseClient";
@@ -75,88 +77,90 @@ const IndustrialInput: React.FC<{
   compact,
   tooltip,
 }) => {
-    const [inputValue, setInputValue] = useState<string>(
-      value === 0 && optional ? "" : value.toString(),
-    );
+  const [inputValue, setInputValue] = useState<string>(
+    value === 0 && optional ? "" : value.toString(),
+  );
 
-    useEffect(() => {
-      setInputValue((prev) => {
-        const parsed = parseFloat(prev);
-        if (prev === "" && value === 0) return prev;
-        if (!isNaN(parsed) && parsed === value) return prev;
-        return value === 0 && optional ? "" : value.toString();
-      });
-    }, [value, optional]);
+  useEffect(() => {
+    setInputValue((prev) => {
+      const parsed = parseFloat(prev);
+      if (prev === "" && value === 0) return prev;
+      if (!isNaN(parsed) && parsed === value) return prev;
+      return value === 0 && optional ? "" : value.toString();
+    });
+  }, [value, optional]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      let val = e.target.value;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = e.target.value;
 
-      // Remove leading zeros for whole numbers typed by the user to prevent "032"
-      if (val.length > 1 && val.startsWith("0") && !val.startsWith("0.")) {
-        val = val.replace(/^0+/, "");
-        if (val === "") val = "0";
+    // Remove leading zeros for whole numbers typed by the user to prevent "032"
+    if (val.length > 1 && val.startsWith("0") && !val.startsWith("0.")) {
+      val = val.replace(/^0+/, "");
+      if (val === "") val = "0";
+    }
+
+    setInputValue(val);
+    if (val === "") {
+      onChange({ target: { name, value: "0" } } as any);
+    } else {
+      const parsed = parseFloat(val);
+      if (!isNaN(parsed)) {
+        onChange({ target: { name, value: val } } as any);
       }
+    }
+  };
 
-      setInputValue(val);
-      if (val === "") {
-        onChange({ target: { name, value: "0" } } as any);
-      } else {
-        const parsed = parseFloat(val);
-        if (!isNaN(parsed)) {
-          onChange({ target: { name, value: val } } as any);
-        }
-      }
-    };
-
-    return (
-      <div className="flex flex-col gap-1.5 w-full">
-        <label
-          className={`font-black text-slate-500 flex items-center justify-between ${compact ? "text-[8px] mb-0.5" : "text-[9px] tracking-widest ml-1"}`}
-        >
-          <div className="flex items-center gap-1.5 uppercase group cursor-help relative">
-            {label}
-            {tooltip && (
-              <>
-                <Info className="w-3 h-3 text-slate-400 opacity-70 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50 w-48 p-2 bg-slate-800 text-slate-200 text-xs rounded shadow-xl border border-slate-700 normal-case tracking-normal">
-                  {tooltip}
-                </div>
-              </>
-            )}
-          </div>
-          {optional && (
-            <span className="text-[7px] text-slate-600 bg-slate-800/50 px-1 py-0.5 rounded normal-case tracking-normal shrink-0 ml-2">
-              Opz.
-            </span>
+  return (
+    <div className="flex flex-col gap-1.5 w-full">
+      <label
+        className={`font-black text-slate-500 flex items-center justify-between ${compact ? "text-[8px] mb-0.5" : "text-[9px] tracking-widest ml-1"}`}
+      >
+        <div className="flex items-center gap-1.5 uppercase group cursor-help relative">
+          {label}
+          {tooltip && (
+            <>
+              <Info className="w-3 h-3 text-slate-400 opacity-70 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50 w-48 p-2 bg-slate-800 text-slate-200 text-xs rounded shadow-xl border border-slate-700 normal-case tracking-normal">
+                {tooltip}
+              </div>
+            </>
           )}
-        </label>
-        <input
-          type="number"
-          step="any"
-          name={name}
-          value={inputValue}
-          onChange={handleChange}
-          onFocus={(e) => e.target.select()}
-          placeholder={placeholder}
-          className={`w-full text-white mono font-black rounded-lg outline-none transition-all focus:ring-2 focus:ring-emerald-500/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${compact
-              ? "px-3 py-2 text-sm bg-slate-950/50 border"
-              : "border-2 p-2.5 text-sm bg-slate-950"
-            } ${optional && value === 0 && compact
-              ? "border-dashed border-slate-700 text-slate-500"
-              : customColor ||
+        </div>
+        {optional && (
+          <span className="text-[7px] text-slate-600 bg-slate-800/50 px-1 py-0.5 rounded normal-case tracking-normal shrink-0 ml-2">
+            Opz.
+          </span>
+        )}
+      </label>
+      <input
+        type="number"
+        step="any"
+        name={name}
+        value={inputValue}
+        onChange={handleChange}
+        onFocus={(e) => e.target.select()}
+        placeholder={placeholder}
+        className={`w-full text-white mono font-black rounded-lg outline-none transition-all focus:ring-2 focus:ring-emerald-500/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+          compact
+            ? "px-3 py-2 text-sm bg-slate-950/50 border"
+            : "border-2 p-2.5 text-sm bg-slate-950"
+        } ${
+          optional && value === 0 && compact
+            ? "border-dashed border-slate-700 text-slate-500"
+            : customColor ||
               (highlight
                 ? "border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.1)]"
                 : "border-slate-800 focus:border-emerald-500/50")
-            }`}
-        />
-        {helper && (
-          <span className="text-[8px] font-bold text-emerald-500/60 uppercase ml-1">
-            {helper}
-          </span>
-        )}
-      </div>
-    );
-  };
+        }`}
+      />
+      {helper && (
+        <span className="text-[8px] font-bold text-emerald-500/60 uppercase ml-1">
+          {helper}
+        </span>
+      )}
+    </div>
+  );
+};
 
 const ResultCard: React.FC<{
   label: string;
@@ -168,10 +172,11 @@ const ResultCard: React.FC<{
   color?: string;
 }> = ({ label, value, unit, sub, icon, highlight, color }) => (
   <div
-    className={`p-5 rounded-xl border transition-all duration-300 ${highlight
+    className={`p-5 rounded-xl border transition-all duration-300 ${
+      highlight
         ? "bg-emerald-500/[0.03] border-emerald-500/20 shadow-lg"
         : "bg-slate-800/20 border-slate-800 shadow-md"
-      }`}
+    }`}
   >
     <div className="flex justify-between items-start mb-3">
       <div
@@ -465,10 +470,12 @@ const App: React.FC = () => {
   });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const [selectedCut, setSelectedCut] = useState<number>(0);
-  const [logNelForno, setLogNelForno] = useState<number[]>([0, 0, 0, 0, 0]);
+  const [logNelForno, setLogNelForno] = useState<(FornoLog | null)[]>(
+    Array(5).fill(null),
+  );
   const [editingSlot, setEditingSlot] = useState<number | null>(null);
-  const [logCaricatore, setLogCaricatore] = useState<number[]>(
-    Array(12).fill(0),
+  const [logCaricatore, setLogCaricatore] = useState<(FornoLog | null)[]>(
+    Array(12).fill(null),
   );
   const [editingSlotCaricatore, setEditingSlotCaricatore] = useState<
     number | null
@@ -1063,8 +1070,8 @@ const App: React.FC = () => {
     const bpbCorta =
       tirataCorta > scartoTesta + scartoCoda + lunghezzaBarra
         ? Math.floor(
-          (tirataCorta - scartoTesta - scartoCoda) / lunghezzaBarra,
-        ) * numeroLuci
+            (tirataCorta - scartoTesta - scartoCoda) / lunghezzaBarra,
+          ) * numeroLuci
         : 0;
     const isCortaRecuperabile =
       !abilitaGiunta &&
@@ -1226,9 +1233,9 @@ const App: React.FC = () => {
 
   const handleReset = () => {
     setInputs({ ...INITIAL_INPUTS });
-    setLogNelForno([0, 0, 0, 0, 0]);
+    setLogNelForno(Array(5).fill(null));
     setEditingSlot(null);
-    setLogCaricatore(Array(12).fill(0));
+    setLogCaricatore(Array(12).fill(null));
     setEditingSlotCaricatore(null);
     const initialLog = BILLET_TYPES.find(
       (b) => b.id === INITIAL_INPUTS.billettoneId,
@@ -1268,17 +1275,22 @@ const App: React.FC = () => {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2 bg-slate-800 text-slate-300 rounded hover:bg-slate-700 hover:text-white transition-colors border border-slate-700"
           >
-            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {isMobileMenuOpen ? (
+              <X className="w-5 h-5" />
+            ) : (
+              <Menu className="w-5 h-5" />
+            )}
           </button>
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-3 overflow-x-auto w-full md:w-auto">
           <button
             onClick={() => setCurrentView("calcoli")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${currentView === "calcoli"
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${
+              currentView === "calcoli"
                 ? "bg-emerald-500/20 border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.2)]"
                 : "bg-slate-950/50 border-slate-800 hover:border-emerald-500/30 hover:bg-emerald-500/5"
-              }`}
+            }`}
           >
             <Factory
               className={`w-4 h-4 ${currentView === "calcoli" ? "text-emerald-400" : "text-slate-500"}`}
@@ -1295,10 +1307,11 @@ const App: React.FC = () => {
                 v === "gestione-log" ? "calcoli" : "gestione-log",
               )
             }
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${currentView === "gestione-log"
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${
+              currentView === "gestione-log"
                 ? "bg-orange-500/20 border-orange-500/50 shadow-[0_0_12px_rgba(249,115,22,0.2)]"
                 : "bg-slate-950/50 border-slate-800 hover:border-orange-500/30 hover:bg-orange-500/5"
-              }`}
+            }`}
           >
             <Flame
               className={`w-4 h-4 ${currentView === "gestione-log" ? "text-orange-400" : "text-slate-500"}`}
@@ -1310,20 +1323,21 @@ const App: React.FC = () => {
             </span>
             {(logNelForno.some((v) => v > 0) ||
               logCaricatore.some((v) => v > 0)) && (
-                <span className="text-[9px] font-black text-orange-400 bg-orange-500/20 px-1.5 py-0.5 rounded-full">
-                  {logNelForno.filter((v) => v > 0).length +
-                    logCaricatore.filter((v) => v > 0).length}
-                </span>
-              )}
+              <span className="text-[9px] font-black text-orange-400 bg-orange-500/20 px-1.5 py-0.5 rounded-full">
+                {logNelForno.filter((v) => v > 0).length +
+                  logCaricatore.filter((v) => v > 0).length}
+              </span>
+            )}
           </button>
           <button
             onClick={() =>
               setCurrentView((v) => (v === "ordini" ? "calcoli" : "ordini"))
             }
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${currentView === "ordini"
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${
+              currentView === "ordini"
                 ? "bg-violet-500/20 border-violet-500/50 shadow-[0_0_12px_rgba(139,92,246,0.2)]"
                 : "bg-slate-950/50 border-slate-800 hover:border-violet-500/30 hover:bg-violet-500/5"
-              }`}
+            }`}
           >
             <ClipboardList
               className={`w-4 h-4 ${currentView === "ordini" ? "text-violet-400" : "text-slate-500"}`}
@@ -1343,10 +1357,11 @@ const App: React.FC = () => {
             onClick={() =>
               setCurrentView((v) => (v === "archivio" ? "calcoli" : "archivio"))
             }
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${currentView === "archivio"
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${
+              currentView === "archivio"
                 ? "bg-blue-500/20 border-blue-500/50 shadow-[0_0_12px_rgba(59,130,246,0.2)]"
                 : "bg-slate-950/50 border-slate-800 hover:border-blue-500/30 hover:bg-blue-500/5"
-              }`}
+            }`}
           >
             <Box
               className={`w-4 h-4 ${currentView === "archivio" ? "text-blue-400" : "text-slate-500"}`}
@@ -1366,10 +1381,11 @@ const App: React.FC = () => {
             onClick={() =>
               setCurrentView((v) => (v === "report" ? "calcoli" : "report"))
             }
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${currentView === "report"
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${
+              currentView === "report"
                 ? "bg-rose-500/20 border-rose-500/50 shadow-[0_0_12px_rgba(244,63,94,0.2)]"
                 : "bg-slate-950/50 border-slate-800 hover:border-rose-500/30 hover:bg-rose-500/5"
-              }`}
+            }`}
           >
             <FileText
               className={`w-4 h-4 ${currentView === "report" ? "text-rose-400" : "text-slate-500"}`}
@@ -1463,8 +1479,8 @@ const App: React.FC = () => {
                       pesoLordo: Math.round((r.cut / 1000) * 90 * r.billette),
                       pesoNetto: Math.round(
                         activeOrd.numeroBarre *
-                        (activeOrd.lunghezzaBarra / 1000) *
-                        (activeOrd.pesoMTL / 1000),
+                          (activeOrd.lunghezzaBarra / 1000) *
+                          (activeOrd.pesoMTL / 1000),
                       ),
                       completedAt: new Date().toLocaleString("it-IT"),
                     },
@@ -1738,14 +1754,14 @@ const App: React.FC = () => {
               />
               <h2 className="text-xl font-black uppercase tracking-widest text-slate-300">
                 {results.errors.length > 0 &&
-                  inputs.modalitaManuale &&
-                  inputs.taglioManuale > 0
+                inputs.modalitaManuale &&
+                inputs.taglioManuale > 0
                   ? "Billetta Troppo Corta"
                   : "Dati Insufficienti"}
               </h2>
               {results.errors.length > 0 &&
-                inputs.modalitaManuale &&
-                inputs.taglioManuale > 0 ? (
+              inputs.modalitaManuale &&
+              inputs.taglioManuale > 0 ? (
                 <p className="text-rose-400/90 max-w-md text-sm font-medium">
                   {results.errors[0] === "Tirata proiettata insufficiente"
                     ? "La lunghezza della billetta inserita non è sufficiente per ottenere nemmeno una barra con questo profilo considerando gli scarti."
@@ -1850,18 +1866,20 @@ const App: React.FC = () => {
 
               {inputs.billetteEstruse > 0 && (
                 <div
-                  className={`border rounded-xl p-4 space-y-3 animate-in slide-in-from-bottom-2 transition-all duration-500 ${results.isCompletato
+                  className={`border rounded-xl p-4 space-y-3 animate-in slide-in-from-bottom-2 transition-all duration-500 ${
+                    results.isCompletato
                       ? "bg-emerald-500/[0.06] border-emerald-500/30"
                       : "bg-cyan-500/[0.04] border-cyan-500/20"
-                    }`}
+                  }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div
-                        className={`p-1.5 rounded-lg ${results.isCompletato
+                        className={`p-1.5 rounded-lg ${
+                          results.isCompletato
                             ? "bg-emerald-500 shadow-sm shadow-emerald-500/20"
                             : "bg-cyan-500 shadow-sm shadow-cyan-500/20"
-                          }`}
+                        }`}
                       >
                         {results.isCompletato ? (
                           <CheckCircle2 className="w-3.5 h-3.5 text-slate-950" />
@@ -1871,10 +1889,11 @@ const App: React.FC = () => {
                       </div>
                       <div>
                         <h4
-                          className={`text-[9px] font-black uppercase tracking-widest ${results.isCompletato
+                          className={`text-[9px] font-black uppercase tracking-widest ${
+                            results.isCompletato
                               ? "text-emerald-400"
                               : "text-cyan-400"
-                            }`}
+                          }`}
                         >
                           {results.isCompletato
                             ? "Produzione Completata"
@@ -1887,10 +1906,11 @@ const App: React.FC = () => {
                       </div>
                     </div>
                     <span
-                      className={`text-lg font-black mono ${results.isCompletato
+                      className={`text-lg font-black mono ${
+                        results.isCompletato
                           ? "text-emerald-400"
                           : "text-cyan-400"
-                        }`}
+                      }`}
                     >
                       {results.progressPercent.toFixed(1)}%
                     </span>
@@ -1898,10 +1918,11 @@ const App: React.FC = () => {
 
                   <div className="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden p-0.5">
                     <div
-                      className={`h-full rounded-full transition-all duration-1000 ease-out ${results.isCompletato
+                      className={`h-full rounded-full transition-all duration-1000 ease-out ${
+                        results.isCompletato
                           ? "bg-gradient-to-r from-emerald-600 to-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
                           : "bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.4)]"
-                        }`}
+                      }`}
                       style={{ width: `${results.progressPercent}%` }}
                     />
                   </div>
@@ -1912,10 +1933,11 @@ const App: React.FC = () => {
                         Billette Rimaste
                       </span>
                       <span
-                        className={`text-sm font-black mono ${results.billetteRimanenti === 0
+                        className={`text-sm font-black mono ${
+                          results.billetteRimanenti === 0
                             ? "text-emerald-400"
                             : "text-white"
-                          }`}
+                        }`}
                       >
                         {results.billetteRimanenti}
                       </span>
@@ -1933,10 +1955,11 @@ const App: React.FC = () => {
                         Barre Rimaste
                       </span>
                       <span
-                        className={`text-sm font-black mono ${results.barreRimanenti === 0
+                        className={`text-sm font-black mono ${
+                          results.barreRimanenti === 0
                             ? "text-emerald-400"
                             : "text-amber-400"
-                          }`}
+                        }`}
                       >
                         {results.barreRimanenti}
                       </span>
@@ -1946,10 +1969,11 @@ const App: React.FC = () => {
                         Logs Rimasti
                       </span>
                       <span
-                        className={`text-sm font-black mono ${results.logsRimanenti <= 0
+                        className={`text-sm font-black mono ${
+                          results.logsRimanenti <= 0
                             ? "text-emerald-400"
                             : "text-white"
-                          }`}
+                        }`}
                       >
                         {results.logsRimanenti <= 0
                           ? "0"
@@ -1962,7 +1986,7 @@ const App: React.FC = () => {
 
                   {results.isCompletato &&
                     inputs.billetteEstruse >
-                    results.billetteTotaliNecessarie && (
+                      results.billetteTotaliNecessarie && (
                       <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-lg p-2">
                         <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                         <span className="text-[9px] font-bold text-amber-300">
@@ -2013,12 +2037,13 @@ const App: React.FC = () => {
                         <button
                           key={opt.length}
                           onClick={() => setSelectedCut(opt.length)}
-                          className={`group p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-1 relative ${isSelected
+                          className={`group p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-1 relative ${
+                            isSelected
                               ? "border-emerald-500 bg-emerald-500/10"
                               : isBest
                                 ? "border-amber-500/50 bg-amber-500/5"
                                 : "border-slate-800 bg-slate-950/50"
-                            }`}
+                          }`}
                         >
                           {isBest && !isSelected && (
                             <span className="absolute -top-2 text-[7px] font-black text-amber-400 bg-amber-500/20 px-1.5 py-0.5 rounded-full uppercase">
@@ -2051,23 +2076,26 @@ const App: React.FC = () => {
                   </div>
                   {results.bestRecommendation && (
                     <div
-                      className={`mt-4 p-3 rounded-lg border flex items-start gap-3 ${results.bestRecommendation.isCurrentCut
+                      className={`mt-4 p-3 rounded-lg border flex items-start gap-3 ${
+                        results.bestRecommendation.isCurrentCut
                           ? "bg-emerald-500/[0.06] border-emerald-500/30"
                           : "bg-amber-500/[0.06] border-amber-500/30"
-                        }`}
+                      }`}
                     >
                       <ThumbsUp
-                        className={`w-4 h-4 mt-0.5 shrink-0 ${results.bestRecommendation.isCurrentCut
+                        className={`w-4 h-4 mt-0.5 shrink-0 ${
+                          results.bestRecommendation.isCurrentCut
                             ? "text-emerald-400"
                             : "text-amber-400"
-                          }`}
+                        }`}
                       />
                       <div className="space-y-1">
                         <span
-                          className={`text-[9px] font-black uppercase ${results.bestRecommendation.isCurrentCut
+                          className={`text-[9px] font-black uppercase ${
+                            results.bestRecommendation.isCurrentCut
                               ? "text-emerald-400"
                               : "text-amber-400"
-                            }`}
+                          }`}
                         >
                           {results.bestRecommendation.isCurrentCut
                             ? "Stai usando il taglio ottimale!"
@@ -2150,11 +2178,11 @@ const App: React.FC = () => {
                           className="absolute inset-0 opacity-10"
                           style={
                             !inputs.abilitaGiunta &&
-                              !results.isCortaRecuperabile
+                            !results.isCortaRecuperabile
                               ? {
-                                backgroundImage:
-                                  "repeating-linear-gradient(45deg, #000, #000 10px, #ff0000 10px, #ff0000 20px)",
-                              }
+                                  backgroundImage:
+                                    "repeating-linear-gradient(45deg, #000, #000 10px, #ff0000 10px, #ff0000 20px)",
+                                }
                               : {}
                           }
                         ></div>
@@ -2226,14 +2254,14 @@ const App: React.FC = () => {
                             : results.scartoResiduoLog === 0
                               ? "100.0"
                               : (
-                                ((results.pezziInteriPerLog *
-                                  results.cutUtilizzato +
-                                  (results.isCortaRecuperabile
-                                    ? results.scartoResiduoLog
-                                    : 0)) /
-                                  (selectedLog?.length || 1)) *
-                                100
-                              ).toFixed(1)}
+                                  ((results.pezziInteriPerLog *
+                                    results.cutUtilizzato +
+                                    (results.isCortaRecuperabile
+                                      ? results.scartoResiduoLog
+                                      : 0)) /
+                                    (selectedLog?.length || 1)) *
+                                  100
+                                ).toFixed(1)}
                           %
                         </span>
                       </div>
@@ -2311,10 +2339,15 @@ const App: React.FC = () => {
               </div>
 
               {(() => {
-                const logCaricati = logNelForno.filter((v) => v > 0).length;
-                const totalMmForno = logNelForno.reduce((s, v) => s + v, 0);
+                const logCaricati = logNelForno.filter(
+                  (v) => v !== null,
+                ).length;
+                const totalMmForno = logNelForno.reduce(
+                  (s, v) => s + (v?.length || 0),
+                  0,
+                );
                 const totalMmCaricatoreAll = logCaricatore.reduce(
-                  (s, v) => s + v,
+                  (s, v) => s + (v?.length || 0),
                   0,
                 );
                 const logLen = selectedLog?.length || 1;
@@ -2367,7 +2400,7 @@ const App: React.FC = () => {
                                 min={0}
                                 max={8000}
                                 placeholder="mm"
-                                defaultValue={val > 0 ? val : ""}
+                                defaultValue={val !== null ? val.length : ""}
                                 onBlur={(e) => {
                                   if (e.currentTarget.dataset.navigating)
                                     return;
@@ -2377,7 +2410,13 @@ const App: React.FC = () => {
                                   );
                                   setLogNelForno((prev) => {
                                     const n = [...prev];
-                                    n[i] = v;
+                                    n[i] =
+                                      v > 0
+                                        ? {
+                                            length: v,
+                                            lega: val?.lega || "6060",
+                                          }
+                                        : null;
                                     return n;
                                   });
                                   setEditingSlot(null);
@@ -2396,7 +2435,13 @@ const App: React.FC = () => {
                                     );
                                     setLogNelForno((prev) => {
                                       const n = [...prev];
-                                      n[i] = v;
+                                      n[i] =
+                                        v > 0
+                                          ? {
+                                              length: v,
+                                              lega: val?.lega || "6060",
+                                            }
+                                          : null;
                                       return n;
                                     });
                                     const next = e.shiftKey ? i - 1 : i + 1;
@@ -2425,34 +2470,72 @@ const App: React.FC = () => {
                           ) : (
                             <button
                               onClick={() => setEditingSlot(i)}
-                              className={`w-full h-20 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center gap-1 relative ${val > 0
-                                  ? "border-orange-500/50 bg-gradient-to-b from-orange-500/20 to-orange-600/10 shadow-[0_0_15px_rgba(249,115,22,0.15)]"
+                              className={`w-full h-20 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center gap-0.5 relative ${
+                                val !== null
+                                  ? `${ALLOY_COLORS[val.lega].border} bg-gradient-to-b ${ALLOY_COLORS[val.lega].bg} to-transparent shadow-[0_0_15px_rgba(0,0,0,0.2)]`
                                   : "border-slate-800 bg-slate-950/50 hover:border-slate-700"
-                                }`}
+                              }`}
                             >
-                              {val > 0 && (
+                              {val !== null && (
                                 <span
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setLogNelForno((prev) => {
                                       const n = [...prev];
-                                      n[i] = 0;
+                                      n[i] = null;
                                       return n;
                                     });
                                   }}
-                                  className="absolute top-1 right-1.5 text-[9px] font-black text-slate-600 hover:text-red-400 cursor-pointer transition-colors"
+                                  className="absolute top-1 right-1.5 text-[9px] font-black text-slate-500 hover:text-red-400 cursor-pointer transition-colors z-10"
                                 >
                                   ✕
                                 </span>
                               )}
-                              {val > 0 ? (
+                              {val !== null ? (
                                 <>
-                                  <span className="text-lg font-black text-orange-400 mono">
-                                    {val}
+                                  <span
+                                    className={`text-lg font-black mono ${ALLOY_COLORS[val.lega].text}`}
+                                  >
+                                    {val.length}
                                   </span>
-                                  <span className="text-[7px] font-black text-orange-500/60 uppercase">
+                                  <span
+                                    className={`text-[7px] font-black uppercase ${ALLOY_COLORS[val.lega].text} opacity-70`}
+                                  >
                                     mm
                                   </span>
+                                  <div
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setLogNelForno((prev) => {
+                                        const n = [...prev];
+                                        if (n[i] !== null) {
+                                          const alloys: AluminumAlloy[] = [
+                                            "6082",
+                                            "6060",
+                                            "3103",
+                                            "1050",
+                                            "6005",
+                                            "6063",
+                                            "6061",
+                                          ];
+                                          const cIdx = alloys.indexOf(
+                                            n[i]!.lega,
+                                          );
+                                          n[i] = {
+                                            ...n[i]!,
+                                            lega: alloys[
+                                              (cIdx + 1) % alloys.length
+                                            ],
+                                          };
+                                        }
+                                        return n;
+                                      });
+                                    }}
+                                    className={`mt-1 px-1.5 py-0.5 rounded text-[8px] font-black uppercase cursor-pointer hover:brightness-125 transition-all ${ALLOY_COLORS[val.lega].bg} ${ALLOY_COLORS[val.lega].text} border ${ALLOY_COLORS[val.lega].border}`}
+                                    title="Clicca per cambiare Lega"
+                                  >
+                                    {val.lega}
+                                  </div>
                                 </>
                               ) : (
                                 <>
@@ -2520,9 +2603,11 @@ const App: React.FC = () => {
               })()}
 
               {(() => {
-                const logCaricatiC = logCaricatore.filter((v) => v > 0).length;
+                const logCaricatiC = logCaricatore.filter(
+                  (v) => v !== null,
+                ).length;
                 const totalMmCaricatore = logCaricatore.reduce(
-                  (s, v) => s + v,
+                  (s, v) => s + (v?.length || 0),
                   0,
                 );
 
@@ -2564,7 +2649,7 @@ const App: React.FC = () => {
                                 min={0}
                                 max={8000}
                                 placeholder="mm"
-                                defaultValue={val > 0 ? val : ""}
+                                defaultValue={val !== null ? val.length : ""}
                                 onBlur={(e) => {
                                   if (e.currentTarget.dataset.navigating)
                                     return;
@@ -2574,7 +2659,13 @@ const App: React.FC = () => {
                                   );
                                   setLogCaricatore((prev) => {
                                     const n = [...prev];
-                                    n[i] = v;
+                                    n[i] =
+                                      v > 0
+                                        ? {
+                                            length: v,
+                                            lega: val?.lega || "6060",
+                                          }
+                                        : null;
                                     return n;
                                   });
                                   setEditingSlotCaricatore(null);
@@ -2593,7 +2684,13 @@ const App: React.FC = () => {
                                     );
                                     setLogCaricatore((prev) => {
                                       const n = [...prev];
-                                      n[i] = v;
+                                      n[i] =
+                                        v > 0
+                                          ? {
+                                              length: v,
+                                              lega: val?.lega || "6060",
+                                            }
+                                          : null;
                                       return n;
                                     });
                                     const next = e.shiftKey ? i - 1 : i + 1;
@@ -2622,34 +2719,72 @@ const App: React.FC = () => {
                           ) : (
                             <button
                               onClick={() => setEditingSlotCaricatore(i)}
-                              className={`w-full h-16 rounded-lg border-2 transition-all duration-300 flex flex-col items-center justify-center gap-0.5 relative ${val > 0
-                                  ? "border-blue-500/50 bg-gradient-to-b from-blue-500/20 to-blue-600/10 shadow-[0_0_10px_rgba(59,130,246,0.15)]"
+                              className={`w-full h-16 rounded-lg border-2 transition-all duration-300 flex flex-col items-center justify-center gap-0.5 relative ${
+                                val !== null
+                                  ? `${ALLOY_COLORS[val.lega].border} bg-gradient-to-b ${ALLOY_COLORS[val.lega].bg} to-transparent shadow-[0_0_10px_rgba(0,0,0,0.15)]`
                                   : "border-slate-800 bg-slate-950/50 hover:border-slate-700"
-                                }`}
+                              }`}
                             >
-                              {val > 0 && (
+                              {val !== null && (
                                 <span
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setLogCaricatore((prev) => {
                                       const n = [...prev];
-                                      n[i] = 0;
+                                      n[i] = null;
                                       return n;
                                     });
                                   }}
-                                  className="absolute top-0.5 right-1 text-[8px] font-black text-slate-600 hover:text-red-400 cursor-pointer transition-colors"
+                                  className="absolute top-0.5 right-1 text-[8px] font-black text-slate-500 hover:text-red-400 cursor-pointer transition-colors z-10"
                                 >
                                   ✕
                                 </span>
                               )}
-                              {val > 0 ? (
+                              {val !== null ? (
                                 <>
-                                  <span className="text-sm font-black text-blue-400 mono">
-                                    {val}
+                                  <span
+                                    className={`text-sm font-black mono ${ALLOY_COLORS[val.lega].text}`}
+                                  >
+                                    {val.length}
                                   </span>
-                                  <span className="text-[6px] font-black text-blue-500/60 uppercase">
+                                  <span
+                                    className={`text-[6px] font-black uppercase ${ALLOY_COLORS[val.lega].text} opacity-70`}
+                                  >
                                     mm
                                   </span>
+                                  <div
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setLogCaricatore((prev) => {
+                                        const n = [...prev];
+                                        if (n[i] !== null) {
+                                          const alloys: AluminumAlloy[] = [
+                                            "6082",
+                                            "6060",
+                                            "3103",
+                                            "1050",
+                                            "6005",
+                                            "6063",
+                                            "6061",
+                                          ];
+                                          const cIdx = alloys.indexOf(
+                                            n[i]!.lega,
+                                          );
+                                          n[i] = {
+                                            ...n[i]!,
+                                            lega: alloys[
+                                              (cIdx + 1) % alloys.length
+                                            ],
+                                          };
+                                        }
+                                        return n;
+                                      });
+                                    }}
+                                    className={`mt-1 px-1 py-px rounded text-[8px] leading-tight font-black uppercase cursor-pointer hover:brightness-125 transition-all ${ALLOY_COLORS[val.lega].bg} ${ALLOY_COLORS[val.lega].text} border ${ALLOY_COLORS[val.lega].border}`}
+                                    title="Clicca per cambiare Lega"
+                                  >
+                                    {val.lega}
+                                  </div>
                                 </>
                               ) : (
                                 <span className="text-[7px] font-black uppercase text-slate-700">
@@ -2793,10 +2928,11 @@ const App: React.FC = () => {
                     return (
                       <div
                         key={ord.id}
-                        className={`bg-slate-900/30 border rounded-xl transition-all duration-300 overflow-hidden ${isExpanded
+                        className={`bg-slate-900/30 border rounded-xl transition-all duration-300 overflow-hidden ${
+                          isExpanded
                             ? "border-violet-500/40"
                             : "border-slate-800"
-                          }`}
+                        }`}
                       >
                         <div
                           className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-800/30 transition-colors"
@@ -2972,10 +3108,10 @@ const App: React.FC = () => {
                                       prev.map((o) =>
                                         o.id === ord.id
                                           ? {
-                                            ...o,
-                                            numeroBarra:
-                                              e.target.value.toUpperCase(),
-                                          }
+                                              ...o,
+                                              numeroBarra:
+                                                e.target.value.toUpperCase(),
+                                            }
                                           : o,
                                       ),
                                     )
@@ -3025,9 +3161,9 @@ const App: React.FC = () => {
                                       prev.map((o) =>
                                         o.id === ord.id
                                           ? {
-                                            ...o,
-                                            [key]: parseFloat(val) || 0,
-                                          }
+                                              ...o,
+                                              [key]: parseFloat(val) || 0,
+                                            }
                                           : o,
                                       ),
                                     );
@@ -3047,9 +3183,9 @@ const App: React.FC = () => {
                                       prev.map((o) =>
                                         o.id === ord.id
                                           ? {
-                                            ...o,
-                                            billettoneId: e.target.value,
-                                          }
+                                              ...o,
+                                              billettoneId: e.target.value,
+                                            }
                                           : o,
                                       ),
                                     )
@@ -3137,12 +3273,12 @@ const App: React.FC = () => {
                                           prev.map((o) =>
                                             o.id === ord.id
                                               ? {
-                                                ...o,
-                                                billettoneId:
-                                                  r.recommendation!.logId,
-                                                taglioManuale:
-                                                  r.recommendation!.cut,
-                                              }
+                                                  ...o,
+                                                  billettoneId:
+                                                    r.recommendation!.logId,
+                                                  taglioManuale:
+                                                    r.recommendation!.cut,
+                                                }
                                               : o,
                                           ),
                                         )
@@ -3171,9 +3307,12 @@ const App: React.FC = () => {
                     </h3>
                   </div>
                   {(() => {
-                    const totalMmForno = logNelForno.reduce((s, v) => s + v, 0);
+                    const totalMmForno = logNelForno.reduce(
+                      (s, v) => s + (v?.length || 0),
+                      0,
+                    );
                     const totalMmCaricatoreAll = logCaricatore.reduce(
-                      (s, v) => s + v,
+                      (s, v) => s + (v?.length || 0),
                       0,
                     );
                     const totalMmDisponibili =
@@ -3182,9 +3321,9 @@ const App: React.FC = () => {
                     const avgLogLen =
                       ordiniResults.length > 0
                         ? ordiniResults.reduce(
-                          (s, o) => s + o.results.logLen,
-                          0,
-                        ) / ordiniResults.length
+                            (s, o) => s + o.results.logLen,
+                            0,
+                          ) / ordiniResults.length
                         : 8000;
                     const totalMmNeeded = totalLogsOrdini * avgLogLen;
                     const mmMancanti = Math.max(
@@ -3243,7 +3382,7 @@ const App: React.FC = () => {
                                 const remainderLen =
                                   r.logLen > 0 && r.cut > 0
                                     ? r.logLen -
-                                    Math.floor(r.logLen / r.cut) * r.cut
+                                      Math.floor(r.logLen / r.cut) * r.cut
                                     : 0;
                                 const uCorta = Math.max(
                                   0,
@@ -3252,15 +3391,15 @@ const App: React.FC = () => {
                                 const tirCorta = uCorta * r.ratio;
                                 const bpbCortaVal =
                                   tirCorta >
-                                    o.scartoTesta +
+                                  o.scartoTesta +
                                     o.scartoCoda +
                                     o.lunghezzaBarra
                                     ? Math.floor(
-                                      (tirCorta -
-                                        o.scartoTesta -
-                                        o.scartoCoda) /
-                                      o.lunghezzaBarra,
-                                    ) * o.numeroLuci
+                                        (tirCorta -
+                                          o.scartoTesta -
+                                          o.scartoCoda) /
+                                          o.lunghezzaBarra,
+                                      ) * o.numeroLuci
                                     : 0;
                                 // Corta solo se produce MENO barre della billetta standard
                                 const isCorta =
@@ -3283,17 +3422,20 @@ const App: React.FC = () => {
                   })()}
 
                   {(() => {
-                    const totalMmForno = logNelForno.reduce((s, v) => s + v, 0);
+                    const totalMmForno = logNelForno.reduce(
+                      (s, v) => s + (v?.length || 0),
+                      0,
+                    );
                     const totalMmCaricatoreAll = logCaricatore.reduce(
-                      (s, v) => s + v,
+                      (s, v) => s + (v?.length || 0),
                       0,
                     );
                     const avgLogLen =
                       ordiniResults.length > 0
                         ? ordiniResults.reduce(
-                          (s, o) => s + o.results.logLen,
-                          0,
-                        ) / ordiniResults.length
+                            (s, o) => s + o.results.logLen,
+                            0,
+                          ) / ordiniResults.length
                         : 8000;
                     const totalMmNeeded = totalLogsOrdini * avgLogLen;
                     if (
@@ -3645,11 +3787,11 @@ const App: React.FC = () => {
                 const avgS =
                   filtered.filter((e) => e.scartoReale != null).length > 0
                     ? (
-                      filtered
-                        .filter((e) => e.scartoReale != null)
-                        .reduce((s, e) => s + (e.scartoReale || 0), 0) /
-                      filtered.filter((e) => e.scartoReale != null).length
-                    ).toFixed(0)
+                        filtered
+                          .filter((e) => e.scartoReale != null)
+                          .reduce((s, e) => s + (e.scartoReale || 0), 0) /
+                        filtered.filter((e) => e.scartoReale != null).length
+                      ).toFixed(0)
                     : "—";
 
                 return (

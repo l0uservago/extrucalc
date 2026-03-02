@@ -10,6 +10,13 @@ export interface BilletType {
   options: CuttingOption[];
 }
 
+export type AluminumAlloy = "6082" | "6060" | "3103" | "1050" | "6005" | "6063" | "6061";
+
+export interface FornoLog {
+  length: number;
+  lega: AluminumAlloy;
+}
+
 export interface CalculationInputs {
   tirataRiferimento: number;
   taglioRiferimento: number;
