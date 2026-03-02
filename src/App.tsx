@@ -30,6 +30,8 @@ import {
   Download,
   Database,
   Info,
+  Menu,
+  X,
 } from "lucide-react";
 import { BILLET_TYPES, INITIAL_INPUTS } from "./constants";
 import {
@@ -73,90 +75,88 @@ const IndustrialInput: React.FC<{
   compact,
   tooltip,
 }) => {
-  const [inputValue, setInputValue] = useState<string>(
-    value === 0 && optional ? "" : value.toString(),
-  );
+    const [inputValue, setInputValue] = useState<string>(
+      value === 0 && optional ? "" : value.toString(),
+    );
 
-  useEffect(() => {
-    setInputValue((prev) => {
-      const parsed = parseFloat(prev);
-      if (prev === "" && value === 0) return prev;
-      if (!isNaN(parsed) && parsed === value) return prev;
-      return value === 0 && optional ? "" : value.toString();
-    });
-  }, [value, optional]);
+    useEffect(() => {
+      setInputValue((prev) => {
+        const parsed = parseFloat(prev);
+        if (prev === "" && value === 0) return prev;
+        if (!isNaN(parsed) && parsed === value) return prev;
+        return value === 0 && optional ? "" : value.toString();
+      });
+    }, [value, optional]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let val = e.target.value;
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      let val = e.target.value;
 
-    // Remove leading zeros for whole numbers typed by the user to prevent "032"
-    if (val.length > 1 && val.startsWith("0") && !val.startsWith("0.")) {
-      val = val.replace(/^0+/, "");
-      if (val === "") val = "0";
-    }
-
-    setInputValue(val);
-    if (val === "") {
-      onChange({ target: { name, value: "0" } } as any);
-    } else {
-      const parsed = parseFloat(val);
-      if (!isNaN(parsed)) {
-        onChange({ target: { name, value: val } } as any);
+      // Remove leading zeros for whole numbers typed by the user to prevent "032"
+      if (val.length > 1 && val.startsWith("0") && !val.startsWith("0.")) {
+        val = val.replace(/^0+/, "");
+        if (val === "") val = "0";
       }
-    }
-  };
 
-  return (
-    <div className="flex flex-col gap-1.5 w-full">
-      <label
-        className={`font-black text-slate-500 flex items-center justify-between ${compact ? "text-[8px] mb-0.5" : "text-[9px] tracking-widest ml-1"}`}
-      >
-        <div className="flex items-center gap-1.5 uppercase group cursor-help relative">
-          {label}
-          {tooltip && (
-            <>
-              <Info className="w-3 h-3 text-slate-400 opacity-70 group-hover:opacity-100 transition-opacity" />
-              <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50 w-48 p-2 bg-slate-800 text-slate-200 text-xs rounded shadow-xl border border-slate-700 normal-case tracking-normal">
-                {tooltip}
-              </div>
-            </>
+      setInputValue(val);
+      if (val === "") {
+        onChange({ target: { name, value: "0" } } as any);
+      } else {
+        const parsed = parseFloat(val);
+        if (!isNaN(parsed)) {
+          onChange({ target: { name, value: val } } as any);
+        }
+      }
+    };
+
+    return (
+      <div className="flex flex-col gap-1.5 w-full">
+        <label
+          className={`font-black text-slate-500 flex items-center justify-between ${compact ? "text-[8px] mb-0.5" : "text-[9px] tracking-widest ml-1"}`}
+        >
+          <div className="flex items-center gap-1.5 uppercase group cursor-help relative">
+            {label}
+            {tooltip && (
+              <>
+                <Info className="w-3 h-3 text-slate-400 opacity-70 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-50 w-48 p-2 bg-slate-800 text-slate-200 text-xs rounded shadow-xl border border-slate-700 normal-case tracking-normal">
+                  {tooltip}
+                </div>
+              </>
+            )}
+          </div>
+          {optional && (
+            <span className="text-[7px] text-slate-600 bg-slate-800/50 px-1 py-0.5 rounded normal-case tracking-normal shrink-0 ml-2">
+              Opz.
+            </span>
           )}
-        </div>
-        {optional && (
-          <span className="text-[7px] text-slate-600 bg-slate-800/50 px-1 py-0.5 rounded normal-case tracking-normal shrink-0 ml-2">
-            Opz.
-          </span>
-        )}
-      </label>
-      <input
-        type="number"
-        step="any"
-        name={name}
-        value={inputValue}
-        onChange={handleChange}
-        onFocus={(e) => e.target.select()}
-        placeholder={placeholder}
-        className={`w-full text-white mono font-black rounded-lg outline-none transition-all focus:ring-2 focus:ring-emerald-500/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
-          compact
-            ? "px-3 py-2 text-sm bg-slate-950/50 border"
-            : "border-2 p-2.5 text-sm bg-slate-950"
-        } ${
-          optional && value === 0 && compact
-            ? "border-dashed border-slate-700 text-slate-500"
-            : customColor ||
+        </label>
+        <input
+          type="number"
+          step="any"
+          name={name}
+          value={inputValue}
+          onChange={handleChange}
+          onFocus={(e) => e.target.select()}
+          placeholder={placeholder}
+          className={`w-full text-white mono font-black rounded-lg outline-none transition-all focus:ring-2 focus:ring-emerald-500/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${compact
+              ? "px-3 py-2 text-sm bg-slate-950/50 border"
+              : "border-2 p-2.5 text-sm bg-slate-950"
+            } ${optional && value === 0 && compact
+              ? "border-dashed border-slate-700 text-slate-500"
+              : customColor ||
               (highlight
                 ? "border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.1)]"
                 : "border-slate-800 focus:border-emerald-500/50")
-        }`}
-      />
-      {helper && (
-        <span className="text-[8px] font-bold text-emerald-500/60 uppercase ml-1">
-          {helper}
-        </span>
-      )}
-    </div>
-  );
-};
+            }`}
+        />
+        {helper && (
+          <span className="text-[8px] font-bold text-emerald-500/60 uppercase ml-1">
+            {helper}
+          </span>
+        )}
+      </div>
+    );
+  };
 
 const ResultCard: React.FC<{
   label: string;
@@ -168,11 +168,10 @@ const ResultCard: React.FC<{
   color?: string;
 }> = ({ label, value, unit, sub, icon, highlight, color }) => (
   <div
-    className={`p-5 rounded-xl border transition-all duration-300 ${
-      highlight
+    className={`p-5 rounded-xl border transition-all duration-300 ${highlight
         ? "bg-emerald-500/[0.03] border-emerald-500/20 shadow-lg"
         : "bg-slate-800/20 border-slate-800 shadow-md"
-    }`}
+      }`}
   >
     <div className="flex justify-between items-start mb-3">
       <div
@@ -464,6 +463,7 @@ const App: React.FC = () => {
   const [inputs, setInputs] = useState<CalculationInputs>({
     ...INITIAL_INPUTS,
   });
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const [selectedCut, setSelectedCut] = useState<number>(0);
   const [logNelForno, setLogNelForno] = useState<number[]>([0, 0, 0, 0, 0]);
   const [editingSlot, setEditingSlot] = useState<number | null>(null);
@@ -1063,8 +1063,8 @@ const App: React.FC = () => {
     const bpbCorta =
       tirataCorta > scartoTesta + scartoCoda + lunghezzaBarra
         ? Math.floor(
-            (tirataCorta - scartoTesta - scartoCoda) / lunghezzaBarra,
-          ) * numeroLuci
+          (tirataCorta - scartoTesta - scartoCoda) / lunghezzaBarra,
+        ) * numeroLuci
         : 0;
     const isCortaRecuperabile =
       !abilitaGiunta &&
@@ -1262,14 +1262,23 @@ const App: React.FC = () => {
             </p>
           </div>
         </button>
-        <div className="flex items-center gap-1.5 sm:gap-3 overflow-x-auto w-full sm:w-auto">
+
+        <div className="flex items-center gap-2 md:hidden">
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 bg-slate-800 text-slate-300 rounded hover:bg-slate-700 hover:text-white transition-colors border border-slate-700"
+          >
+            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+
+        <div className="flex items-center gap-1.5 sm:gap-3 overflow-x-auto w-full md:w-auto">
           <button
             onClick={() => setCurrentView("calcoli")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${
-              currentView === "calcoli"
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${currentView === "calcoli"
                 ? "bg-emerald-500/20 border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.2)]"
                 : "bg-slate-950/50 border-slate-800 hover:border-emerald-500/30 hover:bg-emerald-500/5"
-            }`}
+              }`}
           >
             <Factory
               className={`w-4 h-4 ${currentView === "calcoli" ? "text-emerald-400" : "text-slate-500"}`}
@@ -1286,11 +1295,10 @@ const App: React.FC = () => {
                 v === "gestione-log" ? "calcoli" : "gestione-log",
               )
             }
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${
-              currentView === "gestione-log"
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${currentView === "gestione-log"
                 ? "bg-orange-500/20 border-orange-500/50 shadow-[0_0_12px_rgba(249,115,22,0.2)]"
                 : "bg-slate-950/50 border-slate-800 hover:border-orange-500/30 hover:bg-orange-500/5"
-            }`}
+              }`}
           >
             <Flame
               className={`w-4 h-4 ${currentView === "gestione-log" ? "text-orange-400" : "text-slate-500"}`}
@@ -1302,21 +1310,20 @@ const App: React.FC = () => {
             </span>
             {(logNelForno.some((v) => v > 0) ||
               logCaricatore.some((v) => v > 0)) && (
-              <span className="text-[9px] font-black text-orange-400 bg-orange-500/20 px-1.5 py-0.5 rounded-full">
-                {logNelForno.filter((v) => v > 0).length +
-                  logCaricatore.filter((v) => v > 0).length}
-              </span>
-            )}
+                <span className="text-[9px] font-black text-orange-400 bg-orange-500/20 px-1.5 py-0.5 rounded-full">
+                  {logNelForno.filter((v) => v > 0).length +
+                    logCaricatore.filter((v) => v > 0).length}
+                </span>
+              )}
           </button>
           <button
             onClick={() =>
               setCurrentView((v) => (v === "ordini" ? "calcoli" : "ordini"))
             }
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${
-              currentView === "ordini"
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${currentView === "ordini"
                 ? "bg-violet-500/20 border-violet-500/50 shadow-[0_0_12px_rgba(139,92,246,0.2)]"
                 : "bg-slate-950/50 border-slate-800 hover:border-violet-500/30 hover:bg-violet-500/5"
-            }`}
+              }`}
           >
             <ClipboardList
               className={`w-4 h-4 ${currentView === "ordini" ? "text-violet-400" : "text-slate-500"}`}
@@ -1336,11 +1343,10 @@ const App: React.FC = () => {
             onClick={() =>
               setCurrentView((v) => (v === "archivio" ? "calcoli" : "archivio"))
             }
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${
-              currentView === "archivio"
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${currentView === "archivio"
                 ? "bg-blue-500/20 border-blue-500/50 shadow-[0_0_12px_rgba(59,130,246,0.2)]"
                 : "bg-slate-950/50 border-slate-800 hover:border-blue-500/30 hover:bg-blue-500/5"
-            }`}
+              }`}
           >
             <Box
               className={`w-4 h-4 ${currentView === "archivio" ? "text-blue-400" : "text-slate-500"}`}
@@ -1360,11 +1366,10 @@ const App: React.FC = () => {
             onClick={() =>
               setCurrentView((v) => (v === "report" ? "calcoli" : "report"))
             }
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${
-              currentView === "report"
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 ${currentView === "report"
                 ? "bg-rose-500/20 border-rose-500/50 shadow-[0_0_12px_rgba(244,63,94,0.2)]"
                 : "bg-slate-950/50 border-slate-800 hover:border-rose-500/30 hover:bg-rose-500/5"
-            }`}
+              }`}
           >
             <FileText
               className={`w-4 h-4 ${currentView === "report" ? "text-rose-400" : "text-slate-500"}`}
@@ -1378,9 +1383,41 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+      <main className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+        {/* Mobile Backdrop Overlay */}
+        {isMobileMenuOpen && (
+          <div
+            className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 lg:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+
         {currentView === "calcoli" && (
-          <aside className="w-full lg:w-[340px] bg-[#0f172a] border-r border-slate-800 p-3 sm:p-5 overflow-y-auto space-y-4 sm:space-y-6 shadow-inner custom-scrollbar max-h-[45vh] lg:max-h-none">
+          <aside
+            className={`
+              w-4/5 sm:w-[340px] lg:w-[340px] 
+              bg-[#0f172a] border-r border-slate-800 
+              p-3 sm:p-5 overflow-y-auto space-y-4 sm:space-y-6 
+              shadow-[10px_0_30px_rgba(0,0,0,0.5)] lg:shadow-inner custom-scrollbar 
+              fixed inset-y-0 left-0 z-50 h-full
+              lg:relative lg:max-h-none lg:translate-x-0
+              transform transition-transform duration-300 ease-in-out
+              ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+            `}
+          >
+            {/* Close Button on Mobile Inside Sidebar */}
+            <div className="flex justify-between items-center lg:hidden border-b border-slate-800 pb-2 mb-2">
+              <span className="text-xs font-black uppercase text-slate-400 tracking-widest">
+                Parametri
+              </span>
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-800 p-1 rounded"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
             {(() => {
               const activeOrd = ordini.find((o) => o.id === activeOrdineId);
               const activeIdx = ordini.findIndex(
@@ -1426,8 +1463,8 @@ const App: React.FC = () => {
                       pesoLordo: Math.round((r.cut / 1000) * 90 * r.billette),
                       pesoNetto: Math.round(
                         activeOrd.numeroBarre *
-                          (activeOrd.lunghezzaBarra / 1000) *
-                          (activeOrd.pesoMTL / 1000),
+                        (activeOrd.lunghezzaBarra / 1000) *
+                        (activeOrd.pesoMTL / 1000),
                       ),
                       completedAt: new Date().toLocaleString("it-IT"),
                     },
@@ -1701,14 +1738,14 @@ const App: React.FC = () => {
               />
               <h2 className="text-xl font-black uppercase tracking-widest text-slate-300">
                 {results.errors.length > 0 &&
-                inputs.modalitaManuale &&
-                inputs.taglioManuale > 0
+                  inputs.modalitaManuale &&
+                  inputs.taglioManuale > 0
                   ? "Billetta Troppo Corta"
                   : "Dati Insufficienti"}
               </h2>
               {results.errors.length > 0 &&
-              inputs.modalitaManuale &&
-              inputs.taglioManuale > 0 ? (
+                inputs.modalitaManuale &&
+                inputs.taglioManuale > 0 ? (
                 <p className="text-rose-400/90 max-w-md text-sm font-medium">
                   {results.errors[0] === "Tirata proiettata insufficiente"
                     ? "La lunghezza della billetta inserita non è sufficiente per ottenere nemmeno una barra con questo profilo considerando gli scarti."
@@ -1813,20 +1850,18 @@ const App: React.FC = () => {
 
               {inputs.billetteEstruse > 0 && (
                 <div
-                  className={`border rounded-xl p-4 space-y-3 animate-in slide-in-from-bottom-2 transition-all duration-500 ${
-                    results.isCompletato
+                  className={`border rounded-xl p-4 space-y-3 animate-in slide-in-from-bottom-2 transition-all duration-500 ${results.isCompletato
                       ? "bg-emerald-500/[0.06] border-emerald-500/30"
                       : "bg-cyan-500/[0.04] border-cyan-500/20"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div
-                        className={`p-1.5 rounded-lg ${
-                          results.isCompletato
+                        className={`p-1.5 rounded-lg ${results.isCompletato
                             ? "bg-emerald-500 shadow-sm shadow-emerald-500/20"
                             : "bg-cyan-500 shadow-sm shadow-cyan-500/20"
-                        }`}
+                          }`}
                       >
                         {results.isCompletato ? (
                           <CheckCircle2 className="w-3.5 h-3.5 text-slate-950" />
@@ -1836,11 +1871,10 @@ const App: React.FC = () => {
                       </div>
                       <div>
                         <h4
-                          className={`text-[9px] font-black uppercase tracking-widest ${
-                            results.isCompletato
+                          className={`text-[9px] font-black uppercase tracking-widest ${results.isCompletato
                               ? "text-emerald-400"
                               : "text-cyan-400"
-                          }`}
+                            }`}
                         >
                           {results.isCompletato
                             ? "Produzione Completata"
@@ -1853,11 +1887,10 @@ const App: React.FC = () => {
                       </div>
                     </div>
                     <span
-                      className={`text-lg font-black mono ${
-                        results.isCompletato
+                      className={`text-lg font-black mono ${results.isCompletato
                           ? "text-emerald-400"
                           : "text-cyan-400"
-                      }`}
+                        }`}
                     >
                       {results.progressPercent.toFixed(1)}%
                     </span>
@@ -1865,11 +1898,10 @@ const App: React.FC = () => {
 
                   <div className="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden p-0.5">
                     <div
-                      className={`h-full rounded-full transition-all duration-1000 ease-out ${
-                        results.isCompletato
+                      className={`h-full rounded-full transition-all duration-1000 ease-out ${results.isCompletato
                           ? "bg-gradient-to-r from-emerald-600 to-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
                           : "bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.4)]"
-                      }`}
+                        }`}
                       style={{ width: `${results.progressPercent}%` }}
                     />
                   </div>
@@ -1880,11 +1912,10 @@ const App: React.FC = () => {
                         Billette Rimaste
                       </span>
                       <span
-                        className={`text-sm font-black mono ${
-                          results.billetteRimanenti === 0
+                        className={`text-sm font-black mono ${results.billetteRimanenti === 0
                             ? "text-emerald-400"
                             : "text-white"
-                        }`}
+                          }`}
                       >
                         {results.billetteRimanenti}
                       </span>
@@ -1902,11 +1933,10 @@ const App: React.FC = () => {
                         Barre Rimaste
                       </span>
                       <span
-                        className={`text-sm font-black mono ${
-                          results.barreRimanenti === 0
+                        className={`text-sm font-black mono ${results.barreRimanenti === 0
                             ? "text-emerald-400"
                             : "text-amber-400"
-                        }`}
+                          }`}
                       >
                         {results.barreRimanenti}
                       </span>
@@ -1916,11 +1946,10 @@ const App: React.FC = () => {
                         Logs Rimasti
                       </span>
                       <span
-                        className={`text-sm font-black mono ${
-                          results.logsRimanenti <= 0
+                        className={`text-sm font-black mono ${results.logsRimanenti <= 0
                             ? "text-emerald-400"
                             : "text-white"
-                        }`}
+                          }`}
                       >
                         {results.logsRimanenti <= 0
                           ? "0"
@@ -1933,7 +1962,7 @@ const App: React.FC = () => {
 
                   {results.isCompletato &&
                     inputs.billetteEstruse >
-                      results.billetteTotaliNecessarie && (
+                    results.billetteTotaliNecessarie && (
                       <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-lg p-2">
                         <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                         <span className="text-[9px] font-bold text-amber-300">
@@ -1984,13 +2013,12 @@ const App: React.FC = () => {
                         <button
                           key={opt.length}
                           onClick={() => setSelectedCut(opt.length)}
-                          className={`group p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-1 relative ${
-                            isSelected
+                          className={`group p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-1 relative ${isSelected
                               ? "border-emerald-500 bg-emerald-500/10"
                               : isBest
                                 ? "border-amber-500/50 bg-amber-500/5"
                                 : "border-slate-800 bg-slate-950/50"
-                          }`}
+                            }`}
                         >
                           {isBest && !isSelected && (
                             <span className="absolute -top-2 text-[7px] font-black text-amber-400 bg-amber-500/20 px-1.5 py-0.5 rounded-full uppercase">
@@ -2023,26 +2051,23 @@ const App: React.FC = () => {
                   </div>
                   {results.bestRecommendation && (
                     <div
-                      className={`mt-4 p-3 rounded-lg border flex items-start gap-3 ${
-                        results.bestRecommendation.isCurrentCut
+                      className={`mt-4 p-3 rounded-lg border flex items-start gap-3 ${results.bestRecommendation.isCurrentCut
                           ? "bg-emerald-500/[0.06] border-emerald-500/30"
                           : "bg-amber-500/[0.06] border-amber-500/30"
-                      }`}
+                        }`}
                     >
                       <ThumbsUp
-                        className={`w-4 h-4 mt-0.5 shrink-0 ${
-                          results.bestRecommendation.isCurrentCut
+                        className={`w-4 h-4 mt-0.5 shrink-0 ${results.bestRecommendation.isCurrentCut
                             ? "text-emerald-400"
                             : "text-amber-400"
-                        }`}
+                          }`}
                       />
                       <div className="space-y-1">
                         <span
-                          className={`text-[9px] font-black uppercase ${
-                            results.bestRecommendation.isCurrentCut
+                          className={`text-[9px] font-black uppercase ${results.bestRecommendation.isCurrentCut
                               ? "text-emerald-400"
                               : "text-amber-400"
-                          }`}
+                            }`}
                         >
                           {results.bestRecommendation.isCurrentCut
                             ? "Stai usando il taglio ottimale!"
@@ -2125,11 +2150,11 @@ const App: React.FC = () => {
                           className="absolute inset-0 opacity-10"
                           style={
                             !inputs.abilitaGiunta &&
-                            !results.isCortaRecuperabile
+                              !results.isCortaRecuperabile
                               ? {
-                                  backgroundImage:
-                                    "repeating-linear-gradient(45deg, #000, #000 10px, #ff0000 10px, #ff0000 20px)",
-                                }
+                                backgroundImage:
+                                  "repeating-linear-gradient(45deg, #000, #000 10px, #ff0000 10px, #ff0000 20px)",
+                              }
                               : {}
                           }
                         ></div>
@@ -2201,14 +2226,14 @@ const App: React.FC = () => {
                             : results.scartoResiduoLog === 0
                               ? "100.0"
                               : (
-                                  ((results.pezziInteriPerLog *
-                                    results.cutUtilizzato +
-                                    (results.isCortaRecuperabile
-                                      ? results.scartoResiduoLog
-                                      : 0)) /
-                                    (selectedLog?.length || 1)) *
-                                  100
-                                ).toFixed(1)}
+                                ((results.pezziInteriPerLog *
+                                  results.cutUtilizzato +
+                                  (results.isCortaRecuperabile
+                                    ? results.scartoResiduoLog
+                                    : 0)) /
+                                  (selectedLog?.length || 1)) *
+                                100
+                              ).toFixed(1)}
                           %
                         </span>
                       </div>
@@ -2400,11 +2425,10 @@ const App: React.FC = () => {
                           ) : (
                             <button
                               onClick={() => setEditingSlot(i)}
-                              className={`w-full h-20 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center gap-1 relative ${
-                                val > 0
+                              className={`w-full h-20 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center gap-1 relative ${val > 0
                                   ? "border-orange-500/50 bg-gradient-to-b from-orange-500/20 to-orange-600/10 shadow-[0_0_15px_rgba(249,115,22,0.15)]"
                                   : "border-slate-800 bg-slate-950/50 hover:border-slate-700"
-                              }`}
+                                }`}
                             >
                               {val > 0 && (
                                 <span
@@ -2598,11 +2622,10 @@ const App: React.FC = () => {
                           ) : (
                             <button
                               onClick={() => setEditingSlotCaricatore(i)}
-                              className={`w-full h-16 rounded-lg border-2 transition-all duration-300 flex flex-col items-center justify-center gap-0.5 relative ${
-                                val > 0
+                              className={`w-full h-16 rounded-lg border-2 transition-all duration-300 flex flex-col items-center justify-center gap-0.5 relative ${val > 0
                                   ? "border-blue-500/50 bg-gradient-to-b from-blue-500/20 to-blue-600/10 shadow-[0_0_10px_rgba(59,130,246,0.15)]"
                                   : "border-slate-800 bg-slate-950/50 hover:border-slate-700"
-                              }`}
+                                }`}
                             >
                               {val > 0 && (
                                 <span
@@ -2770,11 +2793,10 @@ const App: React.FC = () => {
                     return (
                       <div
                         key={ord.id}
-                        className={`bg-slate-900/30 border rounded-xl transition-all duration-300 overflow-hidden ${
-                          isExpanded
+                        className={`bg-slate-900/30 border rounded-xl transition-all duration-300 overflow-hidden ${isExpanded
                             ? "border-violet-500/40"
                             : "border-slate-800"
-                        }`}
+                          }`}
                       >
                         <div
                           className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-800/30 transition-colors"
@@ -2950,10 +2972,10 @@ const App: React.FC = () => {
                                       prev.map((o) =>
                                         o.id === ord.id
                                           ? {
-                                              ...o,
-                                              numeroBarra:
-                                                e.target.value.toUpperCase(),
-                                            }
+                                            ...o,
+                                            numeroBarra:
+                                              e.target.value.toUpperCase(),
+                                          }
                                           : o,
                                       ),
                                     )
@@ -3003,9 +3025,9 @@ const App: React.FC = () => {
                                       prev.map((o) =>
                                         o.id === ord.id
                                           ? {
-                                              ...o,
-                                              [key]: parseFloat(val) || 0,
-                                            }
+                                            ...o,
+                                            [key]: parseFloat(val) || 0,
+                                          }
                                           : o,
                                       ),
                                     );
@@ -3025,9 +3047,9 @@ const App: React.FC = () => {
                                       prev.map((o) =>
                                         o.id === ord.id
                                           ? {
-                                              ...o,
-                                              billettoneId: e.target.value,
-                                            }
+                                            ...o,
+                                            billettoneId: e.target.value,
+                                          }
                                           : o,
                                       ),
                                     )
@@ -3115,12 +3137,12 @@ const App: React.FC = () => {
                                           prev.map((o) =>
                                             o.id === ord.id
                                               ? {
-                                                  ...o,
-                                                  billettoneId:
-                                                    r.recommendation!.logId,
-                                                  taglioManuale:
-                                                    r.recommendation!.cut,
-                                                }
+                                                ...o,
+                                                billettoneId:
+                                                  r.recommendation!.logId,
+                                                taglioManuale:
+                                                  r.recommendation!.cut,
+                                              }
                                               : o,
                                           ),
                                         )
@@ -3160,9 +3182,9 @@ const App: React.FC = () => {
                     const avgLogLen =
                       ordiniResults.length > 0
                         ? ordiniResults.reduce(
-                            (s, o) => s + o.results.logLen,
-                            0,
-                          ) / ordiniResults.length
+                          (s, o) => s + o.results.logLen,
+                          0,
+                        ) / ordiniResults.length
                         : 8000;
                     const totalMmNeeded = totalLogsOrdini * avgLogLen;
                     const mmMancanti = Math.max(
@@ -3221,7 +3243,7 @@ const App: React.FC = () => {
                                 const remainderLen =
                                   r.logLen > 0 && r.cut > 0
                                     ? r.logLen -
-                                      Math.floor(r.logLen / r.cut) * r.cut
+                                    Math.floor(r.logLen / r.cut) * r.cut
                                     : 0;
                                 const uCorta = Math.max(
                                   0,
@@ -3230,15 +3252,15 @@ const App: React.FC = () => {
                                 const tirCorta = uCorta * r.ratio;
                                 const bpbCortaVal =
                                   tirCorta >
-                                  o.scartoTesta +
+                                    o.scartoTesta +
                                     o.scartoCoda +
                                     o.lunghezzaBarra
                                     ? Math.floor(
-                                        (tirCorta -
-                                          o.scartoTesta -
-                                          o.scartoCoda) /
-                                          o.lunghezzaBarra,
-                                      ) * o.numeroLuci
+                                      (tirCorta -
+                                        o.scartoTesta -
+                                        o.scartoCoda) /
+                                      o.lunghezzaBarra,
+                                    ) * o.numeroLuci
                                     : 0;
                                 // Corta solo se produce MENO barre della billetta standard
                                 const isCorta =
@@ -3269,9 +3291,9 @@ const App: React.FC = () => {
                     const avgLogLen =
                       ordiniResults.length > 0
                         ? ordiniResults.reduce(
-                            (s, o) => s + o.results.logLen,
-                            0,
-                          ) / ordiniResults.length
+                          (s, o) => s + o.results.logLen,
+                          0,
+                        ) / ordiniResults.length
                         : 8000;
                     const totalMmNeeded = totalLogsOrdini * avgLogLen;
                     if (
@@ -3623,11 +3645,11 @@ const App: React.FC = () => {
                 const avgS =
                   filtered.filter((e) => e.scartoReale != null).length > 0
                     ? (
-                        filtered
-                          .filter((e) => e.scartoReale != null)
-                          .reduce((s, e) => s + (e.scartoReale || 0), 0) /
-                        filtered.filter((e) => e.scartoReale != null).length
-                      ).toFixed(0)
+                      filtered
+                        .filter((e) => e.scartoReale != null)
+                        .reduce((s, e) => s + (e.scartoReale || 0), 0) /
+                      filtered.filter((e) => e.scartoReale != null).length
+                    ).toFixed(0)
                     : "—";
 
                 return (
