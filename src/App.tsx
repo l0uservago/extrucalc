@@ -1642,7 +1642,7 @@ const App: React.FC = () => {
                 </div>
 
                 {inputs.modalitaManuale && (
-                  <div className="animate-in slide-in-from-top-2">
+                  <div className="animate-in slide-in-from-top-2 space-y-2">
                     <IndustrialInput
                       label="Taglio Attivo (mm)"
                       name="taglioManuale"
@@ -1652,6 +1652,13 @@ const App: React.FC = () => {
                       placeholder="es. 894"
                       optional
                     />
+                    {inputs.taglioManuale > 0 && results.isValid && (
+                      <div className="flex justify-end pr-1">
+                        <span className="text-[10px] uppercase tracking-wider font-bold text-amber-400/90 bg-amber-500/10 px-2 py-1 rounded-md border border-amber-500/20 shadow-sm">
+                          Tirata Stimata: {(results.tirataProiettata / 1000).toFixed(1)}m
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
