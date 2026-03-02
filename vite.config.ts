@@ -24,12 +24,6 @@ export default defineConfig(({ mode }) => {
             proxy.on("proxyReq", (proxyReq, _req, _res) => {
               proxyReq.setHeader("origin", "https://api.dpdf.io");
               proxyReq.removeHeader("referer");
-
-              const token = proxyReq.getHeader("x-dpdf-token");
-              if (token) {
-                proxyReq.setHeader("authorization", `Bearer ${token}`);
-                proxyReq.removeHeader("x-dpdf-token");
-              }
             });
             proxy.on("proxyRes", (proxyRes, req, res) => {
               // Intentionally add CORS headers to the response back to the browser
@@ -40,7 +34,7 @@ export default defineConfig(({ mode }) => {
               );
               res.setHeader(
                 "Access-Control-Allow-Headers",
-                "X-Requested-With,content-type,x-dpdf-token",
+                "X-Requested-With,content-type,Authorization",
               );
 
               if (req.method === "OPTIONS") {

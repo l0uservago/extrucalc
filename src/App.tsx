@@ -3651,12 +3651,11 @@ const App: React.FC = () => {
                           const apiKey = import.meta.env.VITE_DPDF_API_KEY;
 
                           // Use proxy to avoid CORS issues, since dpdf.io blocks localhost origins
-                          // Avoid sending Authorization header directly from client if it triggers a preflight that fails
+                          // In production, vercel.json rewrites this route to api.dpdf.io
                           const res = await fetch("/api/dpdf/v1.0/pdf", {
                             method: "POST",
                             headers: {
-                              // We send the token securely via the Vite Proxy
-                              'x-dpdf-token': apiKey
+                              Authorization: `Bearer ${apiKey}`
                             },
                             body: formData,
                           });
